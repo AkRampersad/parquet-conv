@@ -1,6 +1,8 @@
-import duckdb 
+from typing import Tuple 
 from typing import List
 from typing import Dict
+from typing import Iterator
+import duckdb
 from oakvar import BaseConverter
 
 
@@ -18,8 +20,7 @@ class Converter(BaseConverter):
         The example below checks if the input file's first line indicates
         VCF file format.
         """
-        line = f.readline()
-        return line.startswith("##fileformat=VCF")
+        return f.name.endswith('.parquet') or f.name.endswith('.parquet,gz')
 
     # If your converter module needs something else than
     # the standard way of opening a text input file,
@@ -29,9 +30,7 @@ class Converter(BaseConverter):
     # convert_file method. In that case, uncomment
     # the below convert_file method and add your implementation.
     #
-     def convert_file(
-         self, file, *__args__, exc_handler=None, **__kwargs__
-     ) -> Iterator[Tuple[int, List[dict]]]:
+    def convert_file(self, file, *__args__, exc_handler=None, **__kwargs__) -> Iterator[Tuple[int, List[dict]]]:
         conn = duckdb.connect()
         row_q = 'row_group_num_rows'
         rows = conn.execute(f'SELECT row_group_num_rows FROM parquet_metadata({file})').df().to_dict()
