@@ -20,7 +20,12 @@ class Converter(BaseConverter):
         The example below checks if the input file's first line indicates
         VCF file format.
         """
-        return f.name.endswith('.parquet') or f.name.endswith('.parquet,gz')
+        if f.name.endswith('.parquet'):
+            return True 
+        if f.name.endswith('.parquet.gz'):
+            return True 
+        else: return False
+        
 
     # If your converter module needs something else than
     # the standard way of opening a text input file,
@@ -41,7 +46,7 @@ class Converter(BaseConverter):
         chunk = 10000
         end = chunk
 
-        print(num_rows)
+        
         while start < num_rows:
             print(start)
             QUERY = f'SELECT * FROM parquet_scan("{file}*") LIMIT {chunk} OFFSET {start}'
